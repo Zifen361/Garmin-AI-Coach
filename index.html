@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>70.3 Coach</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#120d33">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="70.3 Coach">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Chakra+Petch:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--y:#ffe600;--o:#ff7a00;--bg:#120d33;--pan:#1b1450;--tx:#f4f1ff;--mu:#b3abe0}
+*{box-sizing:border-box;margin:0}
+body{background:radial-gradient(circle at 50% 0,#3b1c7a 0,#120d33 55%) fixed;color:var(--tx);font:16px/1.55 'Chakra Petch',system-ui,sans-serif;padding:max(20px,env(safe-area-inset-top)) 14px 60px;min-height:100vh}
+.w{max-width:680px;margin:0 auto}
+.bg{font-family:Bangers,Impact,'Arial Black',sans-serif;font-weight:400;letter-spacing:.04em}
+.mu{color:var(--mu)}
+.top{text-align:center;padding:6px 0 4px}
+.days{font-size:clamp(110px,32vw,190px);line-height:.9;color:var(--y);text-shadow:0 0 30px var(--o),5px 5px 0 #000}
+.top h1{font-size:26px;font-weight:400}
+.card{background:var(--pan);border:3px solid #fff;box-shadow:5px 5px 0 var(--y);padding:16px 18px;margin-top:22px}
+.card h2{font-size:28px;color:var(--y);text-shadow:2px 2px 0 #000;margin-bottom:8px;line-height:1}
+.st{display:inline-block;padding:3px 14px;border:3px solid #000;color:#000;font-weight:700;margin-bottom:10px}
+.row{padding:10px 0;border-top:1px solid #3a2f85}
+.row:first-of-type{border-top:0}
+.row b{display:block;color:var(--y);font-size:13px}
+.bar{height:20px;border:3px solid #fff;background:#000;overflow:hidden;margin:6px 0 12px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--o),var(--y));transition:width 1.2s ease}
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.nums b{display:block;font-size:34px;line-height:1;color:#fff}
+.nums span{font-size:12px;color:var(--mu)}
+.big{font-size:30px;line-height:1.1;color:#fff}
+.fl{margin-top:10px;background:#ff2e4d;border:3px solid #000;padding:6px 12px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chips span{background:var(--y);color:#000;padding:2px 12px;font-weight:700;font-size:14px}
+.pl .row{display:grid;grid-template-columns:64px 1fr;gap:2px 12px}
+.pl .row.today{background:#2a1f6e;box-shadow:inset 4px 0 0 var(--y);padding-left:10px}
+.pl .dn{font-size:22px;color:var(--y)}
+.pl small{color:var(--mu)}
+.pr{margin:12px 0}.pr .t{display:flex;justify-content:space-between;font-size:14px}
+details{margin-top:22px;border:3px solid #fff;background:var(--pan);padding:12px 18px}
+summary{cursor:pointer;font-size:24px;color:var(--y)}
+details h3{font-size:20px;margin:16px 0 4px;color:#fff}
+svg text{fill:#b3abe0;font-size:11px}
+button{font:inherit;font-weight:700;background:#ff2e4d;color:#fff;border:3px solid #000;box-shadow:4px 4px 0 #000;padding:8px 18px;cursor:pointer;margin-top:26px}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--y);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style></head><body><div class="w" id="app"><p class="mu">Loading…</p></div>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const n=x=>(x===''||x==null)?'–':x;
+const num=x=>{x=Number(x);return isFinite(x)?x:0};
+const API_URL='https://script.google.com/macros/s/AKfycbx5gUKmdnSY8bBJocQHobu_J7Fa1eHcTQ2oc0bi8mh3fSYyK8zFXYIlwjNVNAqPAbrD/exec';
+const LIVE=true;
+const DEMO={race:{name:'IRONMAN 70.3 Colombo',date:'2027-08-22',days:303,weeks:44,phase:'Foundation',recovery:false,hours:'8-9'},
+kpis:{swimKm:1.2,bikeKm:64,runKm:21,strength:2,hours:7.4,sleep7:6.6,weight:55.4,weightChange:0.4},
+extra:{longest:{swim:0.4,bike:42,run:11},sessions:{swim:2,bike:1,run:2,strength:1},targets:{swim:3,bike:2,run:3,strength:2},weights:[{d:'2026-10-09',kg:54.6},{d:'2026-10-16',kg:54.9},{d:'2026-10-23',kg:55},{d:'2026-10-30',kg:55.4}],weightAge:3},
+weekly:[[1.2,3,2.5,1],[1.5,4,2.8,1.2],[1.7,4.5,3,1],[2,5,3.2,1.2]].map((w,i)=>({'Week start':'W'+(i+1),'Swim h':w[0],'Bike h':w[1],'Run h':w[2],'Strength h':w[3]})),
+trends:[44,47,45,50,48,52,49,51].map((v,i)=>({'HRV last night':v,'HRV weekly avg':48+i*.3})),
+milestones:[['2027-01-31','Swim 400 m without stopping'],['2027-03-31','Swim 1 km without stopping'],['2027-04-30','Swim 1.9 km test'],['2027-08-22','Race day']],
+coach:{readiness:'GREEN',headline:'Strong start. Keep every swim short and sharp.',summary:'This is sample data. Your real message from Claude shows up here after the script runs.',
+nutrition:{calories_kcal:3200,protein_g:100,carbs_g:480,fat_g:90,training_fuel:'Banana and oats before the morning swim. Rice, dal and curd within an hour after.',meal_ideas:['Paneer paratha + curd','Rice, dal, greens','Peanut butter toast','Dates + milk']},
+this_week_plan:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d,i)=>({date:'',day:d,morning:['Swim 40 min (technique)','Run 45 min easy','Swim 40 min','Bike 60 min steady','Swim 40 min','Rest','Long ride 3 h'][i],night:['Strength 40 min','Rest','Easy spin 30 min','Strength 40 min','Rest','Rest','Rest'][i],notes:''}))}};
+
+function bars(rows){
+  rows=rows.slice(-12);if(!rows.length)return '<p class="mu">Appears after your first synced workouts.</p>';
+  const keys=[['Swim h','#3ec6ff'],['Bike h','#ff9d2e'],['Run h','#ff5d73'],['Strength h','#c79bff']];
+  const mx=Math.max(8,...rows.map(r=>keys.reduce((a,k)=>a+num(r[k[0]]),0)));
+  const W=600,H=150,bw=W/rows.length;let s=`<svg viewBox="0 0 ${W} ${H+20}" width="100%" role="img" aria-label="Weekly training hours">`;
+  rows.forEach((r,i)=>{let y=H;keys.forEach(k=>{const h=num(r[k[0]])/mx*H;y-=h;s+=`<rect x="${i*bw+bw*.14}" y="${y}" width="${bw*.72}" height="${h}" fill="${k[1]}"/>`});
+    s+=`<text x="${i*bw+bw/2}" y="${H+14}" text-anchor="middle">${esc(String(r['Week start']).slice(5))}</text>`});
+  return s+'</svg><p class="mu" style="font-size:12px">Blue swim, orange bike, red run, purple strength</p>';}
+function hrv(rows){
+  const a=rows.map(r=>num(r['HRV last night'])),b=rows.map(r=>num(r['HRV weekly avg']));
+  if(a.filter(x=>x>0).length<2)return '<p class="mu">Appears after a few nights of data.</p>';
+  const all=a.concat(b).filter(x=>x>0),lo=Math.min(...all)-4,hi=Math.max(...all)+4,W=600,H=130;
+  const P=v=>v.map((y,i)=>y>0?`${i?'L':'M'}${(i/(v.length-1)*(W-20)+10).toFixed(1)},${(H-(y-lo)/(hi-lo)*H).toFixed(1)}`:'').join(' ');
+  return `<svg viewBox="0 0 ${W} ${H+6}" width="100%" role="img" aria-label="HRV trend"><path d="${P(b)}" fill="none" stroke="#b3abe0" stroke-width="2" stroke-dasharray="5 4"/><path d="${P(a)}" fill="none" stroke="#ffe600" stroke-width="3.5"/></svg><p class="mu" style="font-size:12px">Higher is usually better. Solid is last night, dashed is your weekly average.</p>`;}
+
+function pbar(label,val,max,unit,col){const p=Math.round(Math.min(1,val/max)*100);return `<div class="pr"><div class="t"><span>${label}</span><span>${n(val)} of ${max} ${unit}</span></div><div class="bar" style="margin:4px 0 0"><i data-w="${p}" style="background:${col}"></i></div></div>`}
+function raceBars(e){e=e||{};const l=e.longest||{};return `<section class="card"><h2 class="bg">Race distance progress</h2>${pbar('Swim, longest session',num(l.swim),1.9,'km','#3ec6ff')}${pbar('Bike, longest ride',num(l.bike),90,'km','#ff9d2e')}${pbar('Run, longest run',num(l.run),21.1,'km','#ff5d73')}<p class="mu" style="font-size:13px">Your longest session in the last 8 weeks, against the race distances.</p></section>`}
+function consistency(e){e=e||{};const s=e.sessions||{},t=e.targets||{};const row=(k,lab,col)=>`<div class="pr"><div class="t"><span>${lab}</span><span>${num(s[k])} of ${num(t[k])}</span></div><div class="bar" style="margin:4px 0 0"><i data-w="${Math.round(Math.min(1,num(s[k])/(num(t[k])||1))*100)}" style="background:${col}"></i></div></div>`;return `<section class="card"><h2 class="bg">Sessions this week</h2>${row('swim','Swim','#3ec6ff')}${row('bike','Bike','#ff9d2e')}${row('run','Run','#ff5d73')}${row('strength','Gym strength','#c79bff')}<p class="mu" style="font-size:13px">Monday to Sunday, against your weekly targets.</p></section>`}
+function wline(e){const w=(e&&e.weights)||[];if(w.length<2)return '<p class="mu">Add a weight entry each week in the Weight tab of your sheet. The chart appears after two entries.</p>';
+const ys=w.map(r=>r.kg),lo=Math.min(...ys)-1,hi=Math.max(...ys)+1,W=600,H=120;
+const pts=w.map((r,i)=>[(i/(w.length-1)*(W-30)+15),(H-(r.kg-lo)/(hi-lo)*H)]);
+return `<svg viewBox="0 0 ${W} ${H+22}" width="100%" role="img" aria-label="Weight trend"><path d="${pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="#ffe600" stroke-width="3.5"/>${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#ffe600"/><text x="${p[0]}" y="${H+16}" text-anchor="middle">${w[i].kg}</text>`).join('')}</svg><p class="mu" style="font-size:12px">Each dot is one weigh-in, in kg.</p>`}
+function render(d){
+  const r=d.race,k=d.kpis||{},c=d.coach||{},nu=c.nutrition||{},plan=c.this_week_plan||[];
+  const today=new Date().toISOString().slice(0,10);
+  const t=plan.find(p=>p.date===today)||plan[0]||{};
+  const hp=String(r.hours).split('-').map(Number),mid=(hp[0]+(hp[1]||hp[0]))/2;
+  const rd={GREEN:['#35e08a','Good to go'],AMBER:['#ffc400','Go easy today'],RED:['#ff6b6b','Rest and recover']}[c.readiness]||['#b3abe0','No data yet'];
+  const up=(d.milestones||[]).map(m=>({t:m[0],x:m[1],dd:Math.ceil((new Date(m[0]+'T00:00:00')-new Date())/86400000)})).filter(m=>m.dd>=0).slice(0,4);
+  document.getElementById('app').innerHTML=`
+  <header class="top"><div class="days bg">${esc(r.days)}</div><h1 class="bg">days to ${esc(r.name)}</h1>
+    <p class="mu">${esc(r.phase)} phase${r.recovery?' (lighter week)':''} · ${esc(r.weeks)} weeks to go</p></header>
+
+  <section class="card"><h2 class="bg">Today</h2><span class="st" style="background:${rd[0]}">${rd[1]}</span>
+    <div class="row"><b>MORNING</b>${esc(t.morning||'Waiting for your plan')}</div>
+    <div class="row"><b>NIGHT</b>${esc(t.night||'–')}</div>${t.notes?`<p class="mu">${esc(t.notes)}</p>`:''}</section>
+
+  <section class="card"><h2 class="bg">Last 7 days</h2>
+    <div class="big bg">${n(k.hours)} <span class="mu" style="font-size:20px">of about ${mid} hours</span></div>
+    <div class="bar"><i data-w="${Math.round(Math.min(1,num(k.hours)/mid)*100)}"></i></div>
+    <div class="nums"><div><b class="bg">${n(k.swimKm)}</b><span>swim km</span></div><div><b class="bg">${n(k.bikeKm)}</b><span>bike km</span></div><div><b class="bg">${n(k.runKm)}</b><span>run km</span></div><div><b class="bg">${n(k.strength)}</b><span>strength</span></div></div></section>
+  ${raceBars(d.extra)}${consistency(d.extra)}
+
+  <section class="card"><h2 class="bg">Coach says</h2><div class="big bg">${esc(c.headline||'Run the script to get your first message.')}</div>
+    <p style="margin-top:8px">${esc(c.summary||'')}</p>${(c.flags||[]).map(f=>`<div class="fl">${esc(f)}</div>`).join('')}</section>
+
+  <section class="card"><h2 class="bg">Eat today</h2>
+    <div class="nums"><div><b class="bg">${n(nu.calories_kcal)}</b><span>calories</span></div><div><b class="bg">${n(nu.protein_g)}</b><span>protein g</span></div><div><b class="bg">${n(nu.carbs_g)}</b><span>carbs g</span></div><div><b class="bg">${n(nu.fat_g)}</b><span>fat g</span></div></div>
+    <p style="margin-top:12px">${esc(nu.training_fuel||'')}</p><div class="chips">${(nu.meal_ideas||[]).map(m=>`<span>${esc(m)}</span>`).join('')}</div>
+    <p class="mu" style="margin-top:10px;font-size:14px">Weight: ${n(k.weight)} kg${k.weightChange!==''&&k.weightChange!=null?' ('+(k.weightChange>0?'+':'')+k.weightChange+' kg in 4 weeks)':''}${(d.extra&&d.extra.weightAge!=null&&d.extra.weightAge>7)?' <b style="color:#ffe600">Time to log your weight: last entry was '+d.extra.weightAge+' days ago.</b>':''}</p></section>
+
+  <section class="card pl"><h2 class="bg">Next 7 days</h2>${plan.map(p=>`<div class="row ${p.date===today?'today':''}"><div class="dn bg">${esc(p.day)}</div><div>${esc(p.morning)}<br><small>Night: ${esc(p.night)}</small></div></div>`).join('')||'<p class="mu">Your plan appears after the first coach run.</p>'}</section>
+
+  <details><summary class="bg">More details</summary>
+    <h3>Training hours per week</h3>${bars(d.weekly||[])}
+    <h3>Recovery (HRV) and sleep</h3>${hrv(d.trends||[])}<p class="mu">Average sleep this week: ${n(k.sleep7)} hours</p>
+    <h3>Weight</h3>${wline(d.extra)}<h3>Goals coming up</h3>${up.map(m=>`<div class="row"><b>${esc(m.t)} (${m.dd} days)</b>${esc(m.x)}</div>`).join('')||'<p class="mu">None left.</p>'}</details>
+
+  ${LIVE?'<button id="rf" onclick="refresh()">Refresh from Garmin</button>':'<p class="mu" style="margin-top:24px">Sample data preview. Deploy in Apps Script to see your own.</p>'}`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('.bar i').forEach(e=>e.style.width=e.dataset.w+'%')));
+}
+const KEY_NAME='coachKey',CACHE_NAME='coachData';
+function getKey(){return localStorage.getItem(KEY_NAME)||''}
+function setup(msg){document.getElementById('app').innerHTML=`<section class="card"><h2 class="bg">Connect</h2><p>${esc(msg||'Enter your dashboard key. You only do this once on this phone.')}</p><input id="k" type="password" autocomplete="off" style="width:100%;padding:10px;margin:12px 0;font:inherit"><button onclick="saveKey()">Save</button></section>`}
+function saveKey(){const v=document.getElementById('k').value.trim();if(v){localStorage.setItem(KEY_NAME,v);load()}}
+async function api(extra){const r=await fetch(API_URL+'?format=json&key='+encodeURIComponent(getKey())+(extra||''));const j=await r.json();if(j.error)throw new Error(j.error);return j}
+async function load(){
+  if(!getKey()){setup();return}
+  const cached=localStorage.getItem(CACHE_NAME);
+  if(cached){try{render(JSON.parse(cached))}catch(e){}}
+  try{const j=await api();localStorage.setItem(CACHE_NAME,JSON.stringify(j));render(j)}
+  catch(e){
+    if(String(e.message).indexOf('denied')>-1){localStorage.removeItem(KEY_NAME);setup('That key was not accepted. Try again.')}
+    else if(cached){document.getElementById('app').insertAdjacentHTML('afterbegin','<p class="mu" style="text-align:center">Offline. Showing the last saved data.</p>')}
+    else{document.getElementById('app').innerHTML='<p>Could not load data: '+esc(e.message)+'</p>'}
+  }
+}
+function refresh(){const b=document.getElementById('rf');b.textContent='Updating, about a minute…';b.disabled=true;
+  api('&action=refresh').then(j=>{localStorage.setItem(CACHE_NAME,JSON.stringify(j));render(j)}).catch(e=>{b.disabled=false;b.textContent='Refresh failed: '+e.message})}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+load();
+</script></body></html>
